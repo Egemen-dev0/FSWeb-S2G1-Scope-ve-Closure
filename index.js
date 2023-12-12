@@ -18,7 +18,7 @@
 function ilkiniDon(stringArray, callback) {
   return callback(stringArray[0])
 }
-console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin+metin}));
+console.log('örnek görev:', ilkiniDon(['as', 'sa'], function (metin) { return metin + metin }));
 
 // Başlangıç Challenge'ı Sonu
 
@@ -40,7 +40,7 @@ console.log('örnek görev:', ilkiniDon(['as','sa'],function(metin){return metin
 function skorArtirici() {
   let skor = 0;
   return function skorGuncelle() {
-   return skor++;
+    return skor++;
   }
 }
 
@@ -64,11 +64,12 @@ Aşağıdaki takimSkoru() fonksiyonununda aşağıdakileri yapınız:
 Not: Bu fonskiyon, aşağıdaki diğer görevler için de bir callback fonksiyonu olarak da kullanılacak
 */
 
-function takimSkoru(/*Kodunuzu buraya yazınız*/){
-    /*Kodunuzu buraya yazınız*/
+function takimSkoru(scoree) {
+  scoree = Math.ceil((Math.random() * 15) + 10)
+  return scoree;
 }
 
-
+console.log(takimSkoru());
 
 
 /* Görev 3: macSonucu() 
@@ -84,14 +85,24 @@ Aşağıdaki macSonucu() fonksiyonununda aşağıdakileri yapınız:
   "EvSahibi": 92,
   "KonukTakim": 80
 }
-*/ 
+*/
 
-function macSonucu(/*Kodunuzu buraya yazınız*/){
-  /*Kodunuzu buraya yazınız*/
+function macSonucu(callback, ceyrekSayisi) {
+  let EvSahibi = 0;
+  let konukTakim = 0;
+  for (let i = 0; i <= ceyrekSayisi; i++) {
+
+    EvSahibi += callback(i);
+  }
+  for (let j = 0; j <= ceyrekSayisi; j++) {
+
+    konukTakim += callback(j);
+  }
+  return { "EvSahibi": EvSahibi, "KonukTakim": konukTakim }
 }
 
-
-
+console.table(macSonucu(takimSkoru, 4));
+console.log(macSonucu(takimSkoru, 4));
 
 
 
@@ -109,11 +120,14 @@ Aşağıdaki periyotSkoru() fonksiyonununda aşağıdakileri yapınız:
   */
 
 
-function periyotSkoru(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function periyotSkoru(callback) {
+  let EvSahibi = callback();
+  let KonukTakim = callback();
+
+  return { "EvSahibi": EvSahibi, "KonukTakim": KonukTakim }
 
 }
-
+console.log(periyotSkoru(takimSkoru));
 
 /* Zorlayıcı Görev 5: skorTabelasi() 
 Aşağıdaki skorTabelasi() fonksiyonunu kullanarak aşağıdakileri yapınız:
@@ -146,15 +160,68 @@ MAÇ UZAR ise skorTabelasi(periyotSkoru,takimSkoru,4)
 ] */
 // NOTE: Bununla ilgili bir test yoktur. Eğer logladığınız sonuçlar yukarıdakine benziyor ise tmamlandı sayabilirsiniz.
 
-function skorTabelasi(/*Kodunuzu buraya yazınız*/) {
-  /*Kodunuzu buraya yazınız*/
+function skorTabelasi(callbackPeriodSkoru, callbackTakimSkoru, ceyrekSayisi = 4) {
+  let periodDonus = [];
+  let EvTakimiSkorlari = [];
+  let KonukTakimSkorlari = [];
+  for (let i = 1; i <= ceyrekSayisi; i++) {
+    let periodScore = callbackPeriodSkoru(callbackTakimSkoru);
+    periodDonus.push(`${i}. Periyot: ${periodScore.EvSahibi} - ${periodScore.KonukTakim}`)
+    EvTakimiSkorlari.push(periodScore.EvSahibi);
+    KonukTakimSkorlari.push(periodScore.KonukTakim);
+  }
+  let totalEv = EvTakimiSkorlari.reduce((toplam, deger) => toplam + deger, 0)
+  let totalKonuk = KonukTakimSkorlari.reduce((toplam, deger) => toplam + deger, 0)
+  if (totalEv === totalKonuk) {
+    let uzatmaSkoru = callbackPeriodSkoru(callbackTakimSkoru);
+    let sayac = 1;
+
+    while (uzatmaSkoru.EvSahibi === uzatmaSkoru.KonukTakim) {
+      periodDonus.push(` ${sayac}. Uzatma: Ev Sahibi ${uzatmaSkoru.EvSahibi} - Konuk Takım ${uzatmaSkoru.KonukTakim}`)
+      totalEv += uzatmaSkoru.EvSahibi;
+      totalKonuk += uzatmaSkoru.KonukTakim;
+      uzatmaSkoru = callbackPeriodSkoru(callbackTakimSkoru);
+      sayac++;
+    }
+  }
+  periodDonus.push(`Maç Sonucu: EvSahibi: ${totalEv} - Konuk Takim ${totalKonuk}`)
+
+  return periodDonus;
 }
+
+console.log(skorTabelasi(periyotSkoru, takimSkoru, 4));
+
+// function skorTabelasi2(callbackPeriodSkoru, callbackTakimSkoru, totalEv, totalKonuk, uzatmaSkoru) {
+//   let periodDonus = [];
+//   let sayac = 1;
+//   
+//   while (totalEv === totalKonuk){
+// periodDonus.push(`${sayac}. Uzatma: Ev Sahibi ${uzatmaSkoru.EvSahibi} - Konuk Takım ${uzatmaSkoru.KonukTakim}`)
+// totalEv += uzatmaSkoru.EvSahibi;
+// totalKonuk += uzatmaSkoru.KonukTakim;
+// uzatmaSkoru = callbackPeriodSkoru(callbackTakimSkoru);
+// sayac ++;
+// }
+// periodDonus.push(`Maç Sonucu: EvSahibi: ${totalEv} - Konuk Takim ${totalKonuk}`);
+// 
+//   return periodDonus;
+// }
+// 
+// console.log(skorTabelasi2(periyotSkoru, takimSkoru, 22, 22, {EvSahibi: 22, KonukTakim: 22}));
+
+//HOCAM BİR YARDIM PLS :(
+
+
+
+
+
+
 
 
 
 
 /* Aşağıdaki satırları lütfen değiştirmeyiniz*/
-function sa(){
+function sa() {
   console.log('Kodlar çalışıyor');
   return 'as';
 }
